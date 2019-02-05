@@ -1,0 +1,26 @@
+---
+# Simple example to create a lambda function and publish a version
+- hosts: localhost
+  gather_facts: no
+  vars:
+    state: present
+    project_folder: /path/to/deployment/package
+    deployment_package: lambda.zip
+    account: 038295212101
+    production_version: 5
+  tasks:
+  - name: AWS Lambda Function
+    lambda:
+      state: "{{ state | default('present') }}"
+      name: myLambdaFunction
+      publish: True
+      description: lambda function description
+      local_path: "{{ project_folder }}/{{ deployment_package }}"
+      runtime: Node.js 6.10
+      timeout: 5
+      handler: lambda.handler
+      memory_size: 128
+      role: "arn:aws:iam::{{ account }}:role/StartStopEC2Instances"
+  - name: show results
+    debug:
+      var: lambda_facts
